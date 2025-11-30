@@ -505,6 +505,44 @@
             border: 1px solid #6ba3ff;
             color: #6ba3ff;
         }
+
+        /* Image Dialog */
+        .image-dialog {
+            background: #1e1e2e;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .image-dialog.active {
+            display: block;
+        }
+
+        .image-dialog-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .image-preview-box {
+            border: 2px dashed #0f3460;
+            border-radius: 5px;
+            padding: 15px;
+            text-align: center;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-preview-box img {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 3px;
+        }
     </style>
 </head>
 <body>
@@ -631,8 +669,58 @@
                     </div>
 
                     <div class="form-group">
+                        <label>Featured Image URL</label>
+                        <input type="text" id="post-featured-image" placeholder="https://example.com/image.jpg">
+                        <small style="color: #888; margin-top: 5px; display: block;">Use Cloudinary, Imgur, or any image URL. Leave blank to use no featured image.</small>
+                        <div id="featured-image-preview" style="margin-top: 10px; max-height: 200px; border-radius: 5px; overflow: hidden; display: none;">
+                            <img id="featured-preview-img" style="max-width: 100%; height: auto;" alt="Featured image preview">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label>Content (Markdown)</label>
+                        <div style="display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap;">
+                            <button type="button" class="btn-secondary btn-small" onclick="app.insertHeading2()">H2</button>
+                            <button type="button" class="btn-secondary btn-small" onclick="app.insertHeading3()">H3</button>
+                            <button type="button" class="btn-secondary btn-small" onclick="app.insertImage()">🖼️ Image</button>
+                            <button type="button" class="btn-secondary btn-small" onclick="app.insertBold()"><strong>B</strong></button>
+                            <button type="button" class="btn-secondary btn-small" onclick="app.insertItalic()"><em>I</em></button>
+                            <button type="button" class="btn-secondary btn-small" onclick="app.insertLink()">🔗 Link</button>
+                            <button type="button" class="btn-secondary btn-small" onclick="app.insertBulletList()">• List</button>
+                        </div>
                         <textarea id="post-content" placeholder="Your post content in Markdown..."></textarea>
+                    </div>
+
+                    <!-- Image Insert Dialog -->
+                    <div id="image-dialog" class="image-dialog">
+                        <h3 style="color: #00d4ff; margin-bottom: 15px;">🖼️ Insert Image</h3>
+                        <div class="image-dialog-row">
+                            <div class="form-group">
+                                <label>Image URL</label>
+                                <input type="text" id="image-url" placeholder="https://example.com/image.jpg">
+                            </div>
+                            <div class="form-group">
+                                <label>Alt Text (Description)</label>
+                                <input type="text" id="image-alt" placeholder="Describe the image for accessibility">
+                            </div>
+                        </div>
+                        <div class="image-dialog-row">
+                            <div class="form-group">
+                                <label>Image Caption (optional)</label>
+                                <input type="text" id="image-caption" placeholder="Caption to display below image">
+                            </div>
+                            <div class="form-group">
+                                <label>Image Width (pixels)</label>
+                                <input type="text" id="image-width" placeholder="600" value="600">
+                            </div>
+                        </div>
+                        <div class="image-preview-box" id="image-preview-container">
+                            <span style="color: #888;">Image preview will appear here</span>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 15px;">
+                            <button type="button" class="btn-primary" onclick="app.confirmImageInsert()">✓ Insert Image</button>
+                            <button type="button" class="btn-secondary" onclick="app.cancelImageInsert()">Cancel</button>
+                        </div>
                     </div>
 
                     <div style="display: flex; gap: 10px;">
@@ -770,6 +858,7 @@
             tags: [],
             categories: [],
             currentPostId: null,
+            imageDialogOpen: false,
 
             init() {
                 this.loadData();
@@ -827,6 +916,28 @@
 
                 // Set today's date by default
                 this.setDefaultDate();
+
+                // Featured image preview listener
+                document.getElementById('post-featured-image').addEventListener('input', (e) => {
+                    const preview = document.getElementById('featured-image-preview');
+                    const img = document.getElementById('featured-preview-img');
+                    
+                    if (e.target.value.trim()) {
+                        img.src = e.target.value;
+                        preview.style.display = 'block';
+                        img.onerror = () => {
+                            preview.style.display = 'none';
+                            console.error('Failed to load image preview');
+                        };
+                    } else {
+                        preview.style.display = 'none';
+                    }
+                });
+
+                // Image dialog listeners
+                document.getElementById('image-url').addEventListener('input', () => this.updateImagePreview());
+                document.getElementById('image-caption').addEventListener('input', () => this.updateImagePreview());
+                document.getElementById('image-width').addEventListener('input', () => this.updateImagePreview());
             },
 
             setDefaultDate() {
@@ -881,11 +992,21 @@
                     document.getElementById('post-description').value = post.description;
                     document.getElementById('post-tags').value = post.tags.join(', ');
                     document.getElementById('post-category').value = post.category;
+                    document.getElementById('post-featured-image').value = post.featuredImage || '';
                     document.getElementById('post-content').value = post.content;
                     document.getElementById('post-status').value = post.draft ? 'draft' : 'published';
+                    
+                    // Update featured image preview
+                    if (post.featuredImage) {
+                        const preview = document.getElementById('featured-image-preview');
+                        const img = document.getElementById('featured-preview-img');
+                        img.src = post.featuredImage;
+                        preview.style.display = 'block';
+                    }
                 } else {
                     document.getElementById('editor-title').textContent = 'New Post';
                     document.getElementById('post-form').reset();
+                    document.getElementById('featured-image-preview').style.display = 'none';
                     this.setDefaultDate();
                 }
                 
@@ -902,6 +1023,7 @@
                     description: document.getElementById('post-description').value,
                     tags: document.getElementById('post-tags').value.split(',').map(t => t.trim()).filter(t => t),
                     category: document.getElementById('post-category').value,
+                    featuredImage: document.getElementById('post-featured-image').value || '',
                     content: document.getElementById('post-content').value,
                     draft: document.getElementById('post-status').value === 'draft'
                 };
@@ -1176,6 +1298,155 @@
                     "'": '&#039;'
                 };
                 return text.replace(/[&<>"']/g, m => map[m]);
+            },
+
+            // Markdown editing helpers
+            insertHeading2() {
+                const textarea = document.getElementById('post-content');
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const selectedText = textarea.value.substring(start, end) || 'Heading';
+                const before = textarea.value.substring(0, start);
+                const after = textarea.value.substring(end);
+                
+                textarea.value = before + '## ' + selectedText + '\n\n' + after;
+                textarea.selectionStart = start + 3;
+                textarea.focus();
+            },
+
+            insertHeading3() {
+                const textarea = document.getElementById('post-content');
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const selectedText = textarea.value.substring(start, end) || 'Subheading';
+                const before = textarea.value.substring(0, start);
+                const after = textarea.value.substring(end);
+                
+                textarea.value = before + '### ' + selectedText + '\n\n' + after;
+                textarea.selectionStart = start + 4;
+                textarea.focus();
+            },
+
+            insertBold() {
+                const textarea = document.getElementById('post-content');
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const selectedText = textarea.value.substring(start, end) || 'bold text';
+                const before = textarea.value.substring(0, start);
+                const after = textarea.value.substring(end);
+                
+                textarea.value = before + '**' + selectedText + '**' + after;
+                textarea.selectionStart = start + 2;
+                textarea.focus();
+            },
+
+            insertItalic() {
+                const textarea = document.getElementById('post-content');
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const selectedText = textarea.value.substring(start, end) || 'italic text';
+                const before = textarea.value.substring(0, start);
+                const after = textarea.value.substring(end);
+                
+                textarea.value = before + '*' + selectedText + '*' + after;
+                textarea.selectionStart = start + 1;
+                textarea.focus();
+            },
+
+            insertLink() {
+                const url = prompt('Enter URL:');
+                if (url) {
+                    const textarea = document.getElementById('post-content');
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const selectedText = textarea.value.substring(start, end) || 'link text';
+                    const before = textarea.value.substring(0, start);
+                    const after = textarea.value.substring(end);
+                    
+                    textarea.value = before + '[' + selectedText + '](' + url + ')' + after;
+                    textarea.focus();
+                }
+            },
+
+            insertBulletList() {
+                const textarea = document.getElementById('post-content');
+                const start = textarea.selectionStart;
+                const before = textarea.value.substring(0, start);
+                const after = textarea.value.substring(start);
+                
+                const bulletList = '\n- Item 1\n- Item 2\n- Item 3\n';
+                textarea.value = before + bulletList + after;
+                textarea.selectionStart = start + 2;
+                textarea.focus();
+            },
+
+            insertImage() {
+                this.imageDialogOpen = true;
+                document.getElementById('image-dialog').classList.add('active');
+                document.getElementById('image-url').focus();
+            },
+
+            cancelImageInsert() {
+                this.imageDialogOpen = false;
+                document.getElementById('image-dialog').classList.remove('active');
+                document.getElementById('image-url').value = '';
+                document.getElementById('image-alt').value = '';
+                document.getElementById('image-caption').value = '';
+                document.getElementById('image-width').value = '600';
+            },
+
+            updateImagePreview() {
+                const url = document.getElementById('image-url').value;
+                const caption = document.getElementById('image-caption').value;
+                const width = document.getElementById('image-width').value;
+                const container = document.getElementById('image-preview-container');
+                
+                if (!url) {
+                    container.innerHTML = '<span style="color: #888;">Image preview will appear here</span>';
+                    return;
+                }
+                
+                let html = `<img src="${url}" alt="preview" style="max-width: 100%; max-height: 150px; border-radius: 3px;">`;
+                if (caption) {
+                    html += `<br><small style="color: #888; margin-top: 5px; display: block;">${this.escapeHtml(caption)}</small>`;
+                }
+                
+                container.innerHTML = html;
+            },
+
+            confirmImageInsert() {
+                const url = document.getElementById('image-url').value.trim();
+                const alt = document.getElementById('image-alt').value.trim();
+                const caption = document.getElementById('image-caption').value.trim();
+                const width = document.getElementById('image-width').value.trim() || '600';
+                
+                if (!url) {
+                    this.showAlert('Please enter an image URL', 'error');
+                    return;
+                }
+                
+                if (!alt) {
+                    this.showAlert('Please enter alt text for accessibility', 'error');
+                    return;
+                }
+                
+                const textarea = document.getElementById('post-content');
+                const start = textarea.selectionStart;
+                const before = textarea.value.substring(0, start);
+                const after = textarea.value.substring(start);
+                
+                // Format: ![alt](url "width")
+                let imageMarkdown = `![${alt}](${url} "${width}")`;
+                if (caption) {
+                    imageMarkdown += `\n*${caption}*`;
+                }
+                imageMarkdown += '\n\n';
+                
+                textarea.value = before + imageMarkdown + after;
+                textarea.focus();
+                
+                this.cancelImageInsert();
+                this.showAlert('Image inserted! You can edit the markdown directly if needed.', 'success');
             }
         };
 
