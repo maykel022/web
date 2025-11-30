@@ -588,8 +588,10 @@
 
                 <form id="post-form" onsubmit="app.savePost(event)">
                     <div class="form-group">
-                        <label>Title</label>
-                        <input type="text" id="post-title" required placeholder="Post title">
+                        <label>Title
+                            <span style="color: #888; font-weight: 400; margin-left: 10px;">50-60 chars recommended</span>
+                        </label>
+                        <input type="text" id="post-title" required placeholder="Post title (e.g., 'Bitcoin Rally Continues in November 2025')">
                     </div>
 
                     <div class="form-row">
@@ -607,8 +609,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Description</label>
-                        <input type="text" id="post-description" placeholder="Short description (160 chars)">
+                        <label>Description
+                            <span style="color: #888; font-weight: 400; margin-left: 10px;">150-160 chars for search results</span>
+                        </label>
+                        <input type="text" id="post-description" placeholder="Short description that appears in search results (e.g., 'Bitcoin surges past $50,000 as institutional adoption grows in crypto markets')">
                     </div>
 
                     <div class="form-row">
@@ -636,6 +640,55 @@
                         <button type="button" class="btn-secondary" onclick="app.showSection('posts')">Cancel</button>
                     </div>
                 </form>
+
+                <!-- SEO Tips -->
+                <div style="background: #0f3460; border: 1px solid #00d4ff; border-radius: 8px; padding: 20px; margin-top: 30px;">
+                    <h3 style="color: #00d4ff; margin-bottom: 15px;">📚 SEO Tips for Better Rankings</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 13px; line-height: 1.6;">
+                        <div>
+                            <strong style="color: #90ee90;">📌 Title</strong>
+                            <ul style="margin-left: 15px; color: #ccc; margin-top: 8px;">
+                                <li>50-60 characters ideal</li>
+                                <li>Include main keyword</li>
+                                <li>Make it compelling</li>
+                                <li>Example: "Bitcoin Rally Continues in Nov 2025"</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong style="color: #90ee90;">📋 Description</strong>
+                            <ul style="margin-left: 15px; color: #ccc; margin-top: 8px;">
+                                <li>150-160 characters</li>
+                                <li>Include main keyword</li>
+                                <li>Summarize post</li>
+                                <li>Shows in search results</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong style="color: #90ee90;">🏷️ Tags</strong>
+                            <ul style="margin-left: 15px; color: #ccc; margin-top: 8px;">
+                                <li>3-5 tags per post</li>
+                                <li>Keep consistent</li>
+                                <li>Use lowercase</li>
+                                <li>Examples: bitcoin, defi, trading</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong style="color: #90ee90;">📝 Content</strong>
+                            <ul style="margin-left: 15px; color: #ccc; margin-top: 8px;">
+                                <li>500-2000 words ideal</li>
+                                <li>Use headings (## ###)</li>
+                                <li>Include keywords naturally</li>
+                                <li>First 100 chars crucial</li>
+                            </ul>
+                        </div>
+                        <div style="grid-column: 1 / -1;">
+                            <strong style="color: #90ee90;">✅ Quick Checklist</strong>
+                            <div style="margin-left: 15px; color: #ccc; margin-top: 8px;">
+                                ☐ Unique, descriptive title | ☐ 160-char description | ☐ 3-5 relevant tags | ☐ 500+ words content | ☐ Clear headings | ☐ Focus keyword used naturally | ☐ Links to sources | ☐ Mobile-friendly formatting
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Tags Section -->
@@ -738,6 +791,40 @@
                 document.getElementById('search-posts').addEventListener('input', () => this.renderPosts());
                 document.getElementById('filter-status').addEventListener('change', () => this.renderPosts());
 
+                // SEO: Description character counter
+                document.getElementById('post-description').addEventListener('input', (e) => {
+                    const length = e.target.value.length;
+                    const status = document.getElementById('desc-char-status') || this.createCharStatus();
+                    
+                    if (length < 120) {
+                        status.textContent = `${length}/160 characters (Too short - aim for 150-160)`;
+                        status.style.color = '#ff9800';
+                    } else if (length <= 160) {
+                        status.textContent = `${length}/160 characters (Perfect!)`;
+                        status.style.color = '#90ee90';
+                    } else {
+                        status.textContent = `${length}/160 characters (Too long - trim to 160)`;
+                        status.style.color = '#ff6b6b';
+                    }
+                });
+
+                // SEO: Title character counter
+                document.getElementById('post-title').addEventListener('input', (e) => {
+                    const length = e.target.value.length;
+                    const status = document.getElementById('title-char-status') || this.createTitleStatus();
+                    
+                    if (length < 40) {
+                        status.textContent = `${length}/60 characters (Too short)`;
+                        status.style.color = '#ff9800';
+                    } else if (length <= 60) {
+                        status.textContent = `${length}/60 characters (Perfect!)`;
+                        status.style.color = '#90ee90';
+                    } else {
+                        status.textContent = `${length}/60 characters (A bit long)`;
+                        status.style.color = '#ff9800';
+                    }
+                });
+
                 // Set today's date by default
                 this.setDefaultDate();
             },
@@ -745,6 +832,28 @@
             setDefaultDate() {
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('post-date').value = today;
+            },
+
+            createCharStatus() {
+                const container = document.getElementById('post-description').parentElement;
+                const status = document.createElement('small');
+                status.id = 'desc-char-status';
+                status.style.display = 'block';
+                status.style.marginTop = '5px';
+                status.style.color = '#888';
+                container.appendChild(status);
+                return status;
+            },
+
+            createTitleStatus() {
+                const container = document.getElementById('post-title').parentElement;
+                const status = document.createElement('small');
+                status.id = 'title-char-status';
+                status.style.display = 'block';
+                status.style.marginTop = '5px';
+                status.style.color = '#888';
+                container.appendChild(status);
+                return status;
             },
 
             showSection(sectionId) {
