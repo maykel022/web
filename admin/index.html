@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoTradeInsights - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: #16213e;
+            border-right: 1px solid #0f3460;
+            padding: 20px;
+            overflow-y: auto;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar h1 {
+            font-size: 20px;
+            margin-bottom: 30px;
+            color: #00d4ff;
+            text-align: center;
+            border-bottom: 2px solid #0f3460;
+            padding-bottom: 15px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-menu button {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #b0b0b0;
+            padding: 12px 15px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-menu button:hover {
+            background: #0f3460;
+            color: #00d4ff;
+        }
+
+        .sidebar-menu button.active {
+            background: #00d4ff;
+            color: #16213e;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #0f3460;
+        }
+
+        .header h2 {
+            font-size: 28px;
+            color: #00d4ff;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Buttons */
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #00d4ff;
+            color: #16213e;
+        }
+
+        .btn-primary:hover {
+            background: #00a8cc;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: #0f3460;
+            color: #00d4ff;
+            border: 1px solid #00d4ff;
+        }
+
+        .btn-secondary:hover {
+            background: #00d4ff;
+            color: #16213e;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Posts List */
+        .posts-grid {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .post-card {
+            background: #1e1e2e;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .post-card:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
+        }
+
+        .post-card h3 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .post-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .post-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tag, .category {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .tag {
+            background: #0f3460;
+            color: #00d4ff;
+        }
+
+        .category {
+            background: #2d5f2e;
+            color: #90ee90;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            border-top: 1px solid #0f3460;
+            padding-top: 15px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00d4ff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            background: #0f3460;
+            border: 1px solid #2d2d44;
+            border-radius: 5px;
+            color: #e0e0e0;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 200px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Editor */
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .editor-section {
+            background: #1e1e2e;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .editor-section h3 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+        }
+
+        .preview {
+            background: #0f3460;
+            border: 1px solid #2d2d44;
+            border-radius: 5px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* Search & Filter */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-box select {
+            min-width: 150px;
+        }
+
+        /* Tags & Categories Management */
+        .tag-list, .category-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tag-item, .category-item {
+            background: #0f3460;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .tag-item {
+            color: #00d4ff;
+            border: 1px solid #00d4ff;
+        }
+
+        .category-item {
+            color: #90ee90;
+            border: 1px solid #2d5f2e;
+        }
+
+        .tag-item button, .category-item button {
+            background: transparent;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 0;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1e1e2e;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #0f3460;
+        }
+
+        .modal-header h3 {
+            color: #00d4ff;
+            font-size: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #1e1e2e;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-card h4 {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .stat-card .number {
+            color: #00d4ff;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid #0f3460;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar-menu {
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            .sidebar-menu li {
+                flex: 1;
+                min-width: 150px;
+            }
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.active {
+            display: block;
+        }
+
+        .alert-success {
+            background: #2d5f2e;
+            border: 1px solid #90ee90;
+            color: #90ee90;
+        }
+
+        .alert-error {
+            background: #5f2d2d;
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .alert-info {
+            background: #2d3f5f;
+            border: 1px solid #6ba3ff;
+            color: #6ba3ff;
+        }
+    </style>
+</head>
+<body>
+    <script src="github-integration.js"></script>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h1>🔐 Admin</h1>
+            <ul class="sidebar-menu">
+                <li><button class="nav-btn active" data-section="dashboard">📊 Dashboard</button></li>
+                <li><button class="nav-btn" data-section="posts">📝 Posts</button></li>
+                <li><button class="nav-btn" data-section="editor">✏️ New Post</button></li>
+                <li><button class="nav-btn" data-section="tags">🏷️ Tags</button></li>
+                <li><button class="nav-btn" data-section="categories">📂 Categories</button></li>
+                <li><button class="nav-btn" data-section="settings">⚙️ Settings</button></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Alerts -->
+            <div id="alert" class="alert"></div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="section active">
+                <div class="header">
+                    <h2>📊 Dashboard</h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>Total Posts</h4>
+                        <div class="number" id="stat-posts">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Total Tags</h4>
+                        <div class="number" id="stat-tags">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Total Categories</h4>
+                        <div class="number" id="stat-categories">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Draft Posts</h4>
+                        <div class="number" id="stat-drafts">0</div>
+                    </div>
+                </div>
+
+                <div style="background: #1e1e2e; border: 1px solid #0f3460; border-radius: 8px; padding: 20px;">
+                    <h3 style="color: #00d4ff; margin-bottom: 15px;">Recent Posts</h3>
+                    <div id="recent-posts"></div>
+                </div>
+            </div>
+
+            <!-- Posts Section -->
+            <div id="posts" class="section">
+                <div class="header">
+                    <h2>📝 All Posts</h2>
+                    <div class="header-actions">
+                        <button class="btn-primary" onclick="app.showEditor()">+ New Post</button>
+                    </div>
+                </div>
+
+                <div class="search-box">
+                    <input type="text" id="search-posts" placeholder="Search posts...">
+                    <select id="filter-status">
+                        <option value="">All Status</option>
+                        <option value="published">Published</option>
+                        <option value="draft">Draft</option>
+                    </select>
+                </div>
+
+                <div class="posts-grid" id="posts-list"></div>
+            </div>
+
+            <!-- Editor Section -->
+            <div id="editor" class="section">
+                <div class="header">
+                    <h2>✏️ <span id="editor-title">New Post</span></h2>
+                </div>
+
+                <form id="post-form" onsubmit="app.savePost(event)">
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" id="post-title" required placeholder="Post title">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="post-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="post-status" required>
+                                <option value="published">Published</option>
+                                <option value="draft">Draft</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="post-description" placeholder="Short description (160 chars)">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tags (comma-separated)</label>
+                            <input type="text" id="post-tags" placeholder="crypto,bitcoin,news">
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="post-category">
+                                <option value="news">News</option>
+                                <option value="analysis">Analysis</option>
+                                <option value="tutorial">Tutorial</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Content (Markdown)</label>
+                        <textarea id="post-content" placeholder="Your post content in Markdown..."></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" class="btn-primary">💾 Save Post</button>
+                        <button type="button" class="btn-secondary" onclick="app.showSection('posts')">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tags Section -->
+            <div id="tags" class="section">
+                <div class="header">
+                    <h2>🏷️ Tags</h2>
+                </div>
+
+                <div class="form-group">
+                    <label>Add New Tag</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="new-tag" placeholder="Enter tag name">
+                        <button class="btn-primary" onclick="app.addTag()">Add Tag</button>
+                    </div>
+                </div>
+
+                <h3 style="color: #00d4ff; margin: 20px 0;">Existing Tags</h3>
+                <div class="tag-list" id="tags-list"></div>
+            </div>
+
+            <!-- Categories Section -->
+            <div id="categories" class="section">
+                <div class="header">
+                    <h2>📂 Categories</h2>
+                </div>
+
+                <div class="form-group">
+                    <label>Add New Category</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="new-category" placeholder="Enter category name">
+                        <button class="btn-primary" onclick="app.addCategory()">Add Category</button>
+                    </div>
+                </div>
+
+                <h3 style="color: #00d4ff; margin: 20px 0;">Existing Categories</h3>
+                <div class="category-list" id="categories-list"></div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings" class="section">
+                <div class="header">
+                    <h2>⚙️ Settings</h2>
+                </div>
+
+                <div style="max-width: 600px;">
+                    <div class="form-group">
+                        <label>GitHub Token (for auto-commit)</label>
+                        <input type="password" id="github-token" placeholder="Your GitHub personal access token">
+                        <small style="color: #888; margin-top: 5px; display: block;">Stored locally in browser. Never sent to external servers.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>GitHub Repository</label>
+                        <input type="text" id="github-repo" placeholder="e.g., maykel022/web">
+                    </div>
+
+                    <div class="form-group">
+                        <label>API Mode</label>
+                        <select id="api-mode">
+                            <option value="local">Local Storage Only</option>
+                            <option value="github">GitHub Auto-Commit (coming soon)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-primary" onclick="app.saveSettings()">💾 Save Settings</button>
+
+                    <hr style="border: none; border-top: 1px solid #0f3460; margin: 30px 0;">
+
+                    <h3 style="color: #e74c3c; margin-bottom: 15px;">Danger Zone</h3>
+                    <button class="btn-danger" onclick="app.clearAllData()">🗑️ Clear All Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const app = {
+            posts: [],
+            tags: [],
+            categories: [],
+            currentPostId: null,
+
+            init() {
+                this.loadData();
+                this.setupEventListeners();
+                this.setDefaultDate();
+                this.renderAll();
+                console.log('✅ Admin Dashboard Initialized');
+            },
+
+            setupEventListeners() {
+                // Navigation
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.showSection(e.target.dataset.section);
+                    });
+                });
+
+                // Search & Filter
+                document.getElementById('search-posts').addEventListener('input', () => this.renderPosts());
+                document.getElementById('filter-status').addEventListener('change', () => this.renderPosts());
+
+                // Set today's date by default
+                this.setDefaultDate();
+            },
+
+            setDefaultDate() {
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('post-date').value = today;
+            },
+
+            showSection(sectionId) {
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                
+                document.getElementById(sectionId).classList.add('active');
+                document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+                
+                // Render data when switching sections
+                if (sectionId === 'posts') this.renderPosts();
+                if (sectionId === 'tags') this.renderTags();
+                if (sectionId === 'categories') this.renderCategories();
+                if (sectionId === 'dashboard') this.renderDashboard();
+            },
+
+            showEditor(postId = null) {
+                this.currentPostId = postId;
+                
+                if (postId) {
+                    const post = this.posts.find(p => p.id === postId);
+                    document.getElementById('editor-title').textContent = 'Edit Post';
+                    document.getElementById('post-title').value = post.title;
+                    document.getElementById('post-date').value = post.date;
+                    document.getElementById('post-description').value = post.description;
+                    document.getElementById('post-tags').value = post.tags.join(', ');
+                    document.getElementById('post-category').value = post.category;
+                    document.getElementById('post-content').value = post.content;
+                    document.getElementById('post-status').value = post.draft ? 'draft' : 'published';
+                } else {
+                    document.getElementById('editor-title').textContent = 'New Post';
+                    document.getElementById('post-form').reset();
+                    this.setDefaultDate();
+                }
+                
+                this.showSection('editor');
+            },
+
+            savePost(event) {
+                event.preventDefault();
+                
+                const post = {
+                    id: this.currentPostId || Date.now().toString(),
+                    title: document.getElementById('post-title').value,
+                    date: document.getElementById('post-date').value,
+                    description: document.getElementById('post-description').value,
+                    tags: document.getElementById('post-tags').value.split(',').map(t => t.trim()).filter(t => t),
+                    category: document.getElementById('post-category').value,
+                    content: document.getElementById('post-content').value,
+                    draft: document.getElementById('post-status').value === 'draft'
+                };
+
+                // Check if editing or creating
+                const existingIndex = this.posts.findIndex(p => p.id === this.currentPostId);
+                const isNew = existingIndex < 0;
+                
+                if (existingIndex >= 0) {
+                    this.posts[existingIndex] = post;
+                    this.showAlert('Post updated successfully!', 'success');
+                } else {
+                    this.posts.push(post);
+                    this.showAlert('Post created successfully!', 'success');
+                }
+
+                this.saveData();
+                
+                // Try to sync with GitHub if configured
+                const apiMode = localStorage.getItem('api_mode');
+                if (apiMode === 'github' && githubIntegration.token) {
+                    this.syncPostToGitHub(post, isNew);
+                }
+
+                this.currentPostId = null;
+                this.showSection('posts');
+                this.renderPosts();
+            },
+
+            syncPostToGitHub(post, isNew) {
+                githubIntegration.savePost(post, isNew)
+                    .then(() => {
+                        this.showAlert('✅ Synced to GitHub! GitHub Actions will build your site automatically.', 'success');
+                    })
+                    .catch(error => {
+                        console.error('GitHub sync failed:', error);
+                        this.showAlert('⚠️ GitHub sync failed: ' + error.message + '. Post saved locally.', 'error');
+                    });
+            },
+
+            deletePost(postId) {
+                if (confirm('Are you sure you want to delete this post?')) {
+                    const post = this.posts.find(p => p.id === postId);
+                    this.posts = this.posts.filter(p => p.id !== postId);
+                    this.saveData();
+                    
+                    // Try to sync deletion with GitHub if configured
+                    const apiMode = localStorage.getItem('api_mode');
+                    if (apiMode === 'github' && githubIntegration.token && post) {
+                        githubIntegration.deletePost(post)
+                            .then(() => {
+                                this.showAlert('Post and GitHub entry deleted!', 'success');
+                            })
+                            .catch(error => {
+                                console.error('GitHub delete failed:', error);
+                                this.showAlert('Local post deleted, but GitHub sync failed.', 'error');
+                            });
+                    } else {
+                        this.showAlert('Post deleted successfully!', 'success');
+                    }
+                    
+                    this.renderPosts();
+                }
+            },
+
+            renderPosts() {
+                const searchTerm = document.getElementById('search-posts').value.toLowerCase();
+                const statusFilter = document.getElementById('filter-status').value;
+
+                let filtered = this.posts.filter(post => {
+                    const matchesSearch = post.title.toLowerCase().includes(searchTerm);
+                    const matchesStatus = !statusFilter || (statusFilter === 'draft' ? post.draft : !post.draft);
+                    return matchesSearch && matchesStatus;
+                });
+
+                const html = filtered.length === 0 ? 
+                    '<p style="color: #888; text-align: center;">No posts found</p>' :
+                    filtered.map(post => `
+                        <div class="post-card">
+                            <h3>${this.escapeHtml(post.title)}</h3>
+                            <div class="post-meta">
+                                <span>📅 ${post.date}</span>
+                                <span>${post.draft ? '📝 Draft' : '✅ Published'}</span>
+                            </div>
+                            <div style="margin: 10px 0;">
+                                ${post.tags.map(tag => `<span class="tag">${this.escapeHtml(tag)}</span>`).join('')}
+                                <span class="category">${this.escapeHtml(post.category)}</span>
+                            </div>
+                            <p style="color: #aaa; font-size: 13px; margin: 10px 0;">${this.escapeHtml(post.description.substring(0, 100))}</p>
+                            <div class="post-actions">
+                                <button class="btn-secondary btn-small" onclick="app.showEditor('${post.id}')">✏️ Edit</button>
+                                <button class="btn-danger btn-small" onclick="app.deletePost('${post.id}')">🗑️ Delete</button>
+                            </div>
+                        </div>
+                    `).join('');
+
+                document.getElementById('posts-list').innerHTML = html;
+            },
+
+            addTag() {
+                const newTag = document.getElementById('new-tag').value.trim();
+                if (!newTag) {
+                    this.showAlert('Please enter a tag name', 'error');
+                    return;
+                }
+
+                if (this.tags.includes(newTag)) {
+                    this.showAlert('Tag already exists', 'error');
+                    return;
+                }
+
+                this.tags.push(newTag);
+                this.tags.sort();
+                this.saveData();
+                document.getElementById('new-tag').value = '';
+                this.renderTags();
+                this.showAlert('Tag added successfully!', 'success');
+            },
+
+            deleteTag(tag) {
+                if (confirm(`Delete tag "${tag}"?`)) {
+                    this.tags = this.tags.filter(t => t !== tag);
+                    this.saveData();
+                    this.renderTags();
+                    this.showAlert('Tag deleted successfully!', 'success');
+                }
+            },
+
+            renderTags() {
+                const html = this.tags.length === 0 ?
+                    '<p style="color: #888;">No tags yet</p>' :
+                    this.tags.map(tag => `
+                        <div class="tag-item">
+                            <span>${this.escapeHtml(tag)}</span>
+                            <button onclick="app.deleteTag('${tag}')" title="Delete tag">×</button>
+                        </div>
+                    `).join('');
+
+                document.getElementById('tags-list').innerHTML = html;
+            },
+
+            addCategory() {
+                const newCategory = document.getElementById('new-category').value.trim();
+                if (!newCategory) {
+                    this.showAlert('Please enter a category name', 'error');
+                    return;
+                }
+
+                if (this.categories.includes(newCategory)) {
+                    this.showAlert('Category already exists', 'error');
+                    return;
+                }
+
+                this.categories.push(newCategory);
+                this.categories.sort();
+                this.saveData();
+                document.getElementById('new-category').value = '';
+                this.renderCategories();
+                this.showAlert('Category added successfully!', 'success');
+            },
+
+            deleteCategory(category) {
+                if (confirm(`Delete category "${category}"?`)) {
+                    this.categories = this.categories.filter(c => c !== category);
+                    this.saveData();
+                    this.renderCategories();
+                    this.showAlert('Category deleted successfully!', 'success');
+                }
+            },
+
+            renderCategories() {
+                const html = this.categories.length === 0 ?
+                    '<p style="color: #888;">No categories yet</p>' :
+                    this.categories.map(category => `
+                        <div class="category-item">
+                            <span>${this.escapeHtml(category)}</span>
+                            <button onclick="app.deleteCategory('${category}')" title="Delete category">×</button>
+                        </div>
+                    `).join('');
+
+                document.getElementById('categories-list').innerHTML = html;
+            },
+
+            renderDashboard() {
+                document.getElementById('stat-posts').textContent = this.posts.length;
+                document.getElementById('stat-tags').textContent = this.tags.length;
+                document.getElementById('stat-categories').textContent = this.categories.length;
+                document.getElementById('stat-drafts').textContent = this.posts.filter(p => p.draft).length;
+
+                const recent = this.posts.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+                const html = recent.length === 0 ?
+                    '<p style="color: #888;">No posts yet</p>' :
+                    recent.map(post => `
+                        <div style="padding: 10px 0; border-bottom: 1px solid #0f3460; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>${this.escapeHtml(post.title)}</strong>
+                                <div style="color: #888; font-size: 12px; margin-top: 5px;">${post.date} • ${post.draft ? 'Draft' : 'Published'}</div>
+                            </div>
+                            <button class="btn-secondary btn-small" onclick="app.showEditor('${post.id}')">Edit</button>
+                        </div>
+                    `).join('');
+
+                document.getElementById('recent-posts').innerHTML = html;
+            },
+
+            renderAll() {
+                this.renderPosts();
+                this.renderTags();
+                this.renderCategories();
+                this.renderDashboard();
+            },
+
+            showAlert(message, type = 'info') {
+                const alertEl = document.getElementById('alert');
+                alertEl.textContent = message;
+                alertEl.className = `alert active alert-${type}`;
+                setTimeout(() => alertEl.classList.remove('active'), 3000);
+            },
+
+            saveData() {
+                localStorage.setItem('crypto_posts', JSON.stringify(this.posts));
+                localStorage.setItem('crypto_tags', JSON.stringify(this.tags));
+                localStorage.setItem('crypto_categories', JSON.stringify(this.categories));
+            },
+
+            loadData() {
+                this.posts = JSON.parse(localStorage.getItem('crypto_posts') || '[]');
+                this.tags = JSON.parse(localStorage.getItem('crypto_tags') || '[]');
+                this.categories = JSON.parse(localStorage.getItem('crypto_categories') || '[]');
+
+                // Ensure default categories exist
+                const defaultCategories = ['news', 'analysis', 'tutorial'];
+                defaultCategories.forEach(cat => {
+                    if (!this.categories.includes(cat)) {
+                        this.categories.push(cat);
+                    }
+                });
+                if (this.categories.length > defaultCategories.length) {
+                    this.saveData();
+                }
+            },
+
+            saveSettings() {
+                const token = document.getElementById('github-token').value;
+                const repo = document.getElementById('github-repo').value;
+                const mode = document.getElementById('api-mode').value;
+
+                localStorage.setItem('github_token', token);
+                localStorage.setItem('github_repo', repo);
+                localStorage.setItem('api_mode', mode);
+
+                this.showAlert('Settings saved!', 'success');
+            },
+
+            clearAllData() {
+                if (confirm('Are you sure? This will delete all posts, tags, and categories. This cannot be undone!')) {
+                    localStorage.clear();
+                    this.posts = [];
+                    this.tags = [];
+                    this.categories = [];
+                    this.renderAll();
+                    this.showAlert('All data cleared!', 'success');
+                }
+            },
+
+            escapeHtml(text) {
+                const map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return text.replace(/[&<>"']/g, m => map[m]);
+            }
+        };
+
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => app.init());
+    </script>
+</body>
+</html>
