@@ -5,24 +5,31 @@ An AI-powered cryptocurrency news blog built with Hugo, automated with n8n, and 
 ## 🚀 Features
 
 - **Fast Static Site**: Hugo generates lightning-fast HTML
+- **Admin Dashboard**: Modern web interface to manage posts without code
 - **Daily AI-Generated Content**: Automated posts from crypto news feeds using Claude AI
 - **SEO Optimized**: Tags, categories, XML sitemap, and structured data
 - **Responsive Design**: PaperMod theme with mobile-first layout
 - **Auto-Deploy**: GitHub Actions CI/CD on every push
 - **RSS Feeds**: Stay updated with RSS subscriptions
+- **GitHub Integration**: Optional auto-sync posts to your repository
 
 ## 📁 Project Structure
 
 ```
 cryptotradeinsights/
-├── content/              # Blog posts and pages
-│   ├── posts/           # Blog post markdown files
-│   └── about.md         # About page
-├── themes/PaperMod/     # Hugo theme (submodule)
-├── static/              # Static assets (images, CSS, etc.)
-├── .github/workflows/   # GitHub Actions CI/CD
-├── hugo.toml            # Hugo configuration
-└── README.md            # This file
+├── admin/               # Admin dashboard
+│   ├── index.html       # Dashboard interface
+│   ├── github-integration.js  # GitHub API integration
+│   └── README.md        # Admin guide
+├── content/             # Blog posts and pages
+│   ├── posts/          # Blog post markdown files
+│   └── about.md        # About page
+├── themes/PaperMod/    # Hugo theme (submodule)
+├── static/             # Static assets (images, CSS, etc.)
+├── docs/               # Documentation
+├── .github/workflows/  # GitHub Actions CI/CD
+├── hugo.toml           # Hugo configuration
+└── README.md           # This file
 ```
 
 ## 🛠️ Development
@@ -46,9 +53,22 @@ hugo server -D
 
 3. Open `http://localhost:1313/` in your browser
 
-### Creating Posts
+### Using the Admin Dashboard
 
-Add a new post:
+Create and manage posts visually:
+
+1. While running `hugo server`, open: `http://localhost:1313/admin/`
+2. Create posts with form interface
+3. Manage tags and categories
+4. Auto-sync to GitHub (optional)
+5. Changes appear instantly on site
+
+**Full guide**: See `docs/admin-guide.md`
+
+### Creating Posts Manually
+
+Add a new post via command line:
+````
 ```bash
 hugo new content/posts/my-post-title.md
 ```
