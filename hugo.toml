@@ -1,0 +1,49 @@
+baseURL = 'https://cryptotradeinsights.com/'
+languageCode = 'en-us'
+title = 'CryptoTradeInsights'
+theme = "PaperMod"
+enableRobotsTXT = true
+outputs = { home = ["HTML", "RSS", "JSON"] }
+
+[pagination]
+pagerSize = 10
+
+# SEO and Social
+defaultContentLanguage = "en"
+
+# Params for theme
+[params]
+env = "production"
+description = "Daily crypto news, market updates, and trading insights powered by AI"
+keywords = ["crypto", "bitcoin", "ethereum", "blockchain", "trading", "market"]
+author = "CryptoTradeInsights"
+profileMode.enabled = false
+
+# Social icons
+[[params.socialIcons]]
+name = "twitter"
+url = "https://twitter.com"
+
+[[params.socialIcons]]
+name = "github"
+url = "https://github.com"
+
+[[params.socialIcons]]
+name = "rss"
+url = "index.xml"
+
+# Menu
+[[menu.main]]
+name = "Tags"
+url = "tags"
+weight = 10
+
+[[menu.main]]
+name = "Categories"
+url = "categories"
+weight = 20
+
+[[menu.main]]
+name = "About"
+url = "about"
+weight = 30
